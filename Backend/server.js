@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 const sessionSetup = require('./config/session');
 const authRoutes = require('./routes/authRoutes');
 const cakeRoutes = require('./routes/cakeRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cakes', cakeRoutes);
+app.use('/api/cart', cartRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
