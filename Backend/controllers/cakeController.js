@@ -3,10 +3,25 @@ const Cake = require("../models/cake");
 // Add new cake
 const addCake = async (req, res) => {
   try {
-    const { productName, description, qty, category, price } = req.body;
+    const { productName, description, qty, category, price, toppings } = req.body;
 
     if (!productName || !description || !qty || !category || !price) {
       return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    // Parse toppings if provided
+    let parsedToppings = [];
+    if (toppings && toppings !== "") {
+      try {
+        // Check if toppings is already an array (from JSON request) or a string (from form data)
+        if (Array.isArray(toppings)) {
+          parsedToppings = toppings;
+        } else {
+          parsedToppings = JSON.parse(toppings);
+        }
+      } catch (error) {
+        return res.status(400).json({ success: false, message: "Invalid toppings format" });
+      }
     }
 
     const newCake = new Cake({
@@ -15,7 +30,8 @@ const addCake = async (req, res) => {
       qty,
       category,
       price,
-      image: req.file ? req.file.filename : null
+      image: req.file ? req.file.filename : null,
+      toppings: parsedToppings
     });
 
     await newCake.save();
@@ -54,10 +70,27 @@ const getCakeById = async (req, res) => {
 // Update cake
 const updateCake = async (req, res) => {
   try {
-    const { productName, description, qty, category, price } = req.body;
+    const { productName, description, qty, category, price, toppings } = req.body;
     const updatedData = { productName, description, qty, category, price };
 
     if (req.file) updatedData.image = req.file.filename;
+
+    // Parse toppings if provided
+    if (toppings !== undefined && toppings !== "") {
+      try {
+        // Check if toppings is already an array (from JSON request) or a string (from form data)
+        if (Array.isArray(toppings)) {
+          updatedData.toppings = toppings;
+        } else {
+          updatedData.toppings = JSON.parse(toppings);
+        }
+      } catch (error) {
+        return res.status(400).json({ success: false, message: "Invalid toppings format" });
+      }
+    } else if (toppings === "") {
+      // If empty string is passed, set toppings to empty array
+      updatedData.toppings = [];
+    }
 
     const cake = await Cake.findByIdAndUpdate(req.params.id, updatedData, {
       new: true,

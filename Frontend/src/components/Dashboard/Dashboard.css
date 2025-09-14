@@ -28,7 +28,7 @@
 }
 
 .dashboard-card {
-  background: white;
+  background: #ffa9a6;
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -40,7 +40,7 @@
 }
 
 .dashboard-card h3 {
-  color: #ff6b6b;
+  color: #f7f7f7;
   margin-bottom: 15px;
   font-size: 1.5rem;
 }
@@ -51,7 +51,7 @@
 }
 
 .welcome-message {
-  background: linear-gradient(90deg, #ffffff, #ff4444);
+  background: linear-gradient(90deg, #6dccdd, #75C7E4);
   color: white;
   padding: 40px;
   border-radius: 15px;

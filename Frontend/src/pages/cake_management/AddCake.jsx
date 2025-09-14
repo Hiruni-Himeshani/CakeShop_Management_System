@@ -15,10 +15,38 @@ const AddCake = () => {
     category: "Butter Cake",
   });
 
+  const [toppings, setToppings] = useState([{ name: "", price: "" }]);
+
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
     setData((data) => ({ ...data, [name]: value }));
+  };
+
+  const handleToppingChange = (index, field, value) => {
+    const updatedToppings = [...toppings];
+    updatedToppings[index][field] = value;
+    setToppings(updatedToppings);
+  };
+
+  const addTopping = () => {
+    console.log("Adding new topping");
+    console.log("Current toppings before add:", toppings);
+    const newToppings = [...toppings, { name: "", price: "" }];
+    setToppings(newToppings);
+    console.log("New toppings after add:", newToppings);
+  };
+
+  const removeTopping = (index) => {
+    console.log("Removing topping at index:", index);
+    console.log("Current toppings length:", toppings.length);
+    if (toppings.length > 1) {
+      const updatedToppings = toppings.filter((_, i) => i !== index);
+      setToppings(updatedToppings);
+      console.log("Updated toppings:", updatedToppings);
+    } else {
+      console.log("Cannot remove - only one topping remains");
+    }
   };
 
   const onSubmitHandler = async (event) => {
@@ -31,6 +59,22 @@ const AddCake = () => {
     formData.append("category", data.category);
     formData.append("image", image);
 
+    // Filter out empty toppings and format them
+    const validToppings = toppings.filter(
+      (topping) => topping.name.trim() && topping.price
+    );
+    if (validToppings.length > 0) {
+      formData.append(
+        "toppings",
+        JSON.stringify(
+          validToppings.map((topping) => ({
+            name: topping.name.trim(),
+            price: Number(topping.price),
+          }))
+        )
+      );
+    }
+
     try {
       const response = await axios.post(url, formData);
       if (response.data.success) {
@@ -41,6 +85,7 @@ const AddCake = () => {
           qty: 1,
           category: "Butter Cake",
         });
+        setToppings([{ name: "", price: "" }]);
         setImage(false);
         toast.success("Cake added successfully!");
       }
@@ -138,13 +183,15 @@ const AddCake = () => {
                   required
                 >
                   <option value="Butter Cake">Butter Cake</option>
-                  <option value="Layered Cake">Layered Cake</option>
+                  <option value="Chocolate Cake">Chocolate Cake</option>
                   <option value="Fruit Cake">Fruit Cake</option>
                   <option value="Cheese Cake">Cheese Cake</option>
-                  <option value="Cup Cake">Cup Cake</option>
                   <option value="Theme Cake">Theme Cake</option>
+                  <option value="Birthday Cake">Birthday Cake</option>
+                  <option value="Gateau">Gateau</option>
+                  <option value="Coffee">Coffee Cake</option>
+                  <option value="Cup Cake">Cup Cake</option>
                   <option value="Donut">Donut</option>
-                  <option value="Pastries">Pastries</option>
                 </select>
               </div>
 
@@ -154,7 +201,7 @@ const AddCake = () => {
                   <span className="required">*</span>
                 </label>
                 <div className="input-with-prefix">
-                  <span className="input-prefix">₹</span>
+                  <span className="input-prefix">Rs.</span>
                   <input
                     onChange={onChangeHandler}
                     value={data.price}
@@ -184,6 +231,63 @@ const AddCake = () => {
                   required
                   min="1"
                 />
+              </div>
+            </div>
+
+            {/* Toppings Section */}
+            <div className="form-group">
+              <label className="form-label">
+                <span className="label-text">Available Toppings</span>
+                <span className="optional">(Optional)</span>
+              </label>
+              <div className="toppings-container">
+                {toppings.map((topping, index) => (
+                  <div key={index} className="topping-row">
+                    <input
+                      type="text"
+                      placeholder="Topping name (e.g., Chocolate Chips)"
+                      value={topping.name}
+                      onChange={(e) =>
+                        handleToppingChange(index, "name", e.target.value)
+                      }
+                      className="form-input topping-name"
+                    />
+                    <div className="input-with-prefix topping-price">
+                      <span className="input-prefix">Rs.</span>
+                      <input
+                        type="number"
+                        placeholder="0.00"
+                        value={topping.price}
+                        onChange={(e) =>
+                          handleToppingChange(index, "price", e.target.value)
+                        }
+                        className="form-input with-prefix"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeTopping(index)}
+                      className="remove-topping-btn"
+                      disabled={toppings.length === 1}
+                      title={
+                        toppings.length === 1
+                          ? "Cannot remove the last topping"
+                          : "Remove this topping"
+                      }
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addTopping}
+                  className="add-topping-btn"
+                >
+                  + Add Topping
+                </button>
               </div>
             </div>
           </div>

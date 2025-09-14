@@ -146,10 +146,26 @@ const CakeList = () => {
                     <p className="cake-category">{item.category}</p>
                     <p className="cake-description">{item.description}</p>
 
+                    {/* Toppings Section */}
+                    {item.toppings && item.toppings.length > 0 && (
+                      <div className="toppings-section">
+                        <span className="toppings-label">
+                          Available Toppings:
+                        </span>
+                        <div className="toppings-list">
+                          {item.toppings.map((topping, index) => (
+                            <span key={index} className="topping-item">
+                              {topping.name} (+Rs.{topping.price})
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="cake-info">
                       <div className="price-info">
                         <span className="price-label">Price</span>
-                        <span className="price-value">₹{item.price}</span>
+                        <span className="price-value">Rs{item.price}</span>
                       </div>
                       <div className="quantity-info">
                         <span className="quantity-label">Stock</span>
