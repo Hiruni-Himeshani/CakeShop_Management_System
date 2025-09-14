@@ -524,3 +524,55 @@
     gap: 0.75rem;
   }
 }
+
+/* Toppings Section Styles */
+.toppings-section {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.toppings-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.toppings-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.topping-item {
+  background: white;
+  color: #374151;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.topping-item:hover {
+  background: #2496b5;
+  color: white;
+  border-color: #2496b5;
+}
+
+@media (max-width: 768px) {
+  .toppings-list {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .topping-item {
+    text-align: center;
+  }
+}
