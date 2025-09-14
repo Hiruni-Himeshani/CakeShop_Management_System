@@ -19,13 +19,13 @@ const Footer = () => {
           </div>
           <br />
           <div className="footer-social-icons">
-            <a href="https://www.linkedin.com/in/atharva-rakhunde-114634222/" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">
               <img src={assets.linkedin_icon} alt="LinkedIn" />
             </a>
-            <a href="https://www.facebook.com/profile.php?id=100075380872715" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.facebook.com/share/1FHwYuVJsZ/" target="_blank" rel="noopener noreferrer">
               <img src={assets.facebook_icon} alt="Facebook" />
             </a>
-            <a href="https://www.instagram.com/atharva_rakhunde/" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
               <img src={assets.instagram_icon} alt="Instagram" />
             </a>
           </div>
@@ -44,8 +44,8 @@ const Footer = () => {
         <div className="footer-content-right">
           <h2>Get in Touch</h2>
           <ul>
-            <li><a href="tel:9021290089">+91 1256098</a></li>
-            <li><a href="mailto:atharva.v.rakhunde@gmail.com">contact@bakeLk.com</a></li>
+            <li><a href="tel:+94762636188">+94 762636188</a></li>
+            <li><a href="bake.lk@gmail.com">contact@bakeLk.com</a></li>
 
           </ul>
         </div>
