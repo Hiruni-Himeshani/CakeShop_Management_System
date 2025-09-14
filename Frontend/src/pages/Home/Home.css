@@ -1,0 +1,15 @@
+.home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.home .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.home .footer {
+  margin-top: auto;
+}

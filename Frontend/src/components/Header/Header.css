@@ -1,0 +1,145 @@
+/* Header Styles */
+.header {
+  position: relative;
+  height: auto; /* Auto height instead of full viewport */
+  background: none; /* Remove background image */
+  display: flex;
+  justify-content: center; /* Center align */
+  align-items: center; /* Center align */
+  color: #333; /* Dark text color */
+  padding: 1rem; /* Reduced padding */
+  overflow: hidden; /* Prevent overflow */
+}
+
+/* Remove overlay */
+.header::before {
+  display: none; /* Hide the overlay */
+}
+
+/* Header Contents */
+.header-contents {
+  position: static; /* Normal positioning */
+  display: flex; /* Flexbox for layout */
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center align items */
+  gap: 1rem; /* Space between items */
+  max-width: 800px; /* Max width */
+  text-align: center; /* Center text */
+  z-index: 1; /* Normal z-index */
+}
+
+/* Header Logo Styles */
+.header-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header-logo-img {
+  height: 80px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.header-logo-img:hover {
+  transform: scale(1.05);
+}
+
+/* Heading Styles */
+.header-heading {
+  font-size: clamp(1.5rem, 4vw, 2.5rem); /* Responsive heading size */
+  margin-bottom: 0.5rem; /* Space below heading */
+  text-shadow: none; /* Remove shadow */
+  line-height: 1.2; /* Better line height */
+  color: #333; /* Dark color for visibility */
+}
+
+/* Paragraph Styles */
+.head-para {
+  font-size: clamp(1rem, 2.5vw, 1.5rem); /* Responsive paragraph size */
+  margin-bottom: 1.5rem; /* Space below paragraph */
+  line-height: 1.6; /* Better line spacing */
+  text-align: left;
+  opacity: 0.9; /* Slight transparency for a soft feel */
+  color: #f6f6f6;
+}
+
+/* Button Styles */
+.header-btn {
+  padding: 0.8rem 1rem; /* Button padding */
+  border: none; /* No border */
+  background-color: #5AB4A6; /* Button color */
+  color: #ffffff; /* White text */
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Softer shadow for depth */
+}
+
+.header-btn:hover {
+  background-color: #68e0ce; /* Hover color */
+  transform: scale(1.05); /* Slightly scale up on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .header {
+    padding: 1.5rem; /* Adjust padding for smaller screens */
+  }
+
+  .header-contents {
+    max-width: 90%; /* Wider max width on smaller screens */
+    left: 5%; /* Adjust left position */
+    bottom: 15%; /* Move up slightly from the bottom */
+  }
+
+  .header-heading {
+    font-size: clamp(1.5rem, 5vw, 2rem); /* Reduce heading size on smaller screens */
+  }
+
+  .head-para {
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem); /* Adjust paragraph size */
+  }
+
+  .header-btn {
+    padding: 0.6rem 1.5rem; /* Adjust button padding */
+  }
+}
+
+@media (max-width: 480px) {
+  .header-heading {
+    font-size: clamp(1rem, 4vw, 1.5rem); /* Further reduce heading size */
+  }
+
+  .head-para {
+    font-size: clamp(0.8rem, 2vw, 1rem); /* Further adjust paragraph size */
+  }
+
+  .header-btn {
+    padding: 0.5rem 1rem; /* Further adjust button padding */
+  }
+
+  .header-contents {
+    left: 3%; /* Adjust position further for mobile */
+    bottom: 10%; /* Move up slightly from the bottom */
+  }
+}
+
+/* Animation for fade-in effect */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* Slide in from below */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* End position */
+  }
+}
