@@ -1,0 +1,293 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './Products.css';
+import Header from '../../components/Header/Header';
+import Footer from '../../components/Footer/Footer';
+import { assets } from '../../assets/frontend_assets/assets';
+
+const Products = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [sortBy, setSortBy] = useState('name');
+  const [cart, setCart] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+
+  // Fetch products from backend
+  useEffect(() => {
+    fetchProducts();
+    loadCartFromStorage();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:5000/api/cakes');
+      // Expect backend response: { success: true, data: [...] }
+      if (response.data && response.data.success) {
+        setProducts(Array.isArray(response.data.data) ? response.data.data : []);
+        setError(null);
+      } else {
+        setProducts([]);
+        setError('Failed to fetch products');
+      }
+    } catch (err) {
+      setError('Failed to fetch products');
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load cart from localStorage
+  const loadCartFromStorage = () => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      const cartData = JSON.parse(savedCart);
+      setCart(cartData);
+      setCartCount(cartData.reduce((total, item) => total + item.quantity, 0));
+    }
+  };
+
+  // Save cart to localStorage
+  const saveCartToStorage = (newCart) => {
+    localStorage.setItem('cart', JSON.stringify(newCart));
+    setCart(newCart);
+    setCartCount(newCart.reduce((total, item) => total + item.quantity, 0));
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('cartUpdated'));
+  };
+
+  // Add to cart function
+  const addToCart = (product) => {
+    const existingItem = cart.find(item => item._id === product._id);
+    
+    if (existingItem) {
+      if (existingItem.quantity < product.qty) {
+        const updatedCart = cart.map(item =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+        saveCartToStorage(updatedCart);
+      } else {
+        alert('Not enough stock available');
+      }
+    } else {
+      if (product.qty > 0) {
+        const newItem = {
+          _id: product._id,
+          productName: product.productName,
+          price: product.price,
+          image: product.image,
+          qty: product.qty,
+          quantity: 1
+        };
+        saveCartToStorage([...cart, newItem]);
+      } else {
+        alert('Product is out of stock');
+      }
+    }
+  };
+
+  // Remove from cart function
+  const removeFromCart = (productId) => {
+    const updatedCart = cart.filter(item => item._id !== productId);
+    saveCartToStorage(updatedCart);
+  };
+
+  // Update cart quantity
+  const updateCartQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
+    
+    const updatedCart = cart.map(item =>
+      item._id === productId
+        ? { ...item, quantity: newQuantity }
+        : item
+    );
+    saveCartToStorage(updatedCart);
+  };
+
+  // Get unique categories
+  const categories = ['All', ...new Set((Array.isArray(products) ? products : []).map(product => product.category))];
+
+  // Filter and sort products
+  const filteredProducts = (Array.isArray(products) ? products : [])
+    .filter(product => {
+      const matchesSearch = product.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'name':
+          return a.productName.localeCompare(b.productName);
+        default:
+          return 0;
+      }
+    });
+
+  if (loading) {
+    return (
+      <div className="products-page">
+        <Header />
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading products...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="products-page">
+        <Header />
+        <div className="error-container">
+          <p>{error}</p>
+          <button onClick={fetchProducts} className="retry-btn">Retry</button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="products-page">
+      <Header />
+      
+      <div className="products-container">
+        <div className="products-header">
+          <h1>Our Delicious Cakes</h1>
+          <p>Fresh baked cakes made with love and finest ingredients</p>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="products-filters">
+          <div className="search-container">
+            <img src={assets.search_icon} alt="Search" className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search cakes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+
+          <div className="filter-container">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="category-filter"
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="sort-filter"
+            >
+              <option value="name">Sort by Name</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="products-grid">
+          {filteredProducts.length === 0 ? (
+            <div className="no-products">
+              <p>No products found matching your criteria.</p>
+            </div>
+          ) : (
+            filteredProducts.map(product => (
+              <div key={product._id} className="product-card">
+                <div className="product-image-container">
+                  <img
+                    src={product.image ? `http://localhost:5000/uploads/${product.image}` : assets.menu_1}
+                    alt={product.productName}
+                    className="product-image"
+                  />
+                  {product.qty === 0 && (
+                    <div className="out-of-stock-overlay">
+                      <span>Out of Stock</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="product-info">
+                  <h3 className="product-name">{product.productName}</h3>
+                  <p className="product-description">{product.description}</p>
+                  <div className="product-details">
+                    <span className="product-category">{product.category}</span>
+                    <span className="product-stock">Stock: {product.qty}</span>
+                  </div>
+                  <div className="product-price">${product.price}</div>
+                  
+                  <div className="product-actions">
+                    {cart.find(item => item._id === product._id) ? (
+                      <div className="cart-controls">
+                        <button
+                          onClick={() => updateCartQuantity(product._id, cart.find(item => item._id === product._id).quantity - 1)}
+                          className="quantity-btn"
+                        >
+                          -
+                        </button>
+                        <span className="quantity-display">
+                          {cart.find(item => item._id === product._id).quantity}
+                        </span>
+                        <button
+                          onClick={() => updateCartQuantity(product._id, cart.find(item => item._id === product._id).quantity + 1)}
+                          className="quantity-btn"
+                          disabled={cart.find(item => item._id === product._id).quantity >= product.qty}
+                        >
+                          +
+                        </button>
+                        <button
+                          onClick={() => removeFromCart(product._id)}
+                          className="remove-btn"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => addToCart(product)}
+                        className="add-to-cart-btn"
+                        disabled={product.qty === 0}
+                      >
+                        <img src={assets.add_icon_green} alt="Add to Cart" />
+                        Add to Cart
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Products;

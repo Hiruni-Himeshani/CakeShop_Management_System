@@ -1,6 +1,8 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
+import Products from "./pages/Products/Products";
+import Cart from "./pages/Cart/Cart";
 import AddCake from "./pages/cake_management/AddCake";
 import CakeList from "./pages/cake_management/CakeList";
 import EditCake from "./pages/cake_management/EditCake";
@@ -16,6 +18,8 @@ const App = () => {
       <div className="app">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
