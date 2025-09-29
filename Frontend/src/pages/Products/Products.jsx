@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Products.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { assets } from '../../assets/frontend_assets/assets';
+import { useStore } from '../../context/StoreContext';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -12,13 +14,12 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('name');
-  const [cart, setCart] = useState([]);
-  const [cartCount, setCartCount] = useState(0);
+  const { cartItems: cart, addToCart, updateQuantity, removeFromCart, isAuthenticated } = useStore();
+  const navigate = useNavigate();
 
   // Fetch products from backend
   useEffect(() => {
     fetchProducts();
-    loadCartFromStorage();
   }, []);
 
   const fetchProducts = async () => {
@@ -41,77 +42,18 @@ const Products = () => {
     }
   };
 
-  // Load cart from localStorage
-  const loadCartFromStorage = () => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      const cartData = JSON.parse(savedCart);
-      setCart(cartData);
-      setCartCount(cartData.reduce((total, item) => total + item.quantity, 0));
-    }
-  };
-
-  // Save cart to localStorage
-  const saveCartToStorage = (newCart) => {
-    localStorage.setItem('cart', JSON.stringify(newCart));
-    setCart(newCart);
-    setCartCount(newCart.reduce((total, item) => total + item.quantity, 0));
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('cartUpdated'));
-  };
-
-  // Add to cart function
-  const addToCart = (product) => {
-    const existingItem = cart.find(item => item._id === product._id);
-    
-    if (existingItem) {
-      if (existingItem.quantity < product.qty) {
-        const updatedCart = cart.map(item =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-        saveCartToStorage(updatedCart);
-      } else {
-        alert('Not enough stock available');
-      }
-    } else {
-      if (product.qty > 0) {
-        const newItem = {
-          _id: product._id,
-          productName: product.productName,
-          price: product.price,
-          image: product.image,
-          qty: product.qty,
-          quantity: 1
-        };
-        saveCartToStorage([...cart, newItem]);
-      } else {
-        alert('Product is out of stock');
-      }
-    }
-  };
-
-  // Remove from cart function
-  const removeFromCart = (productId) => {
-    const updatedCart = cart.filter(item => item._id !== productId);
-    saveCartToStorage(updatedCart);
-  };
-
-  // Update cart quantity
-  const updateCartQuantity = (productId, newQuantity) => {
-    if (newQuantity <= 0) {
-      removeFromCart(productId);
+  const onAddToCart = async (product) => {
+    if (!isAuthenticated) {
+      alert('Please login to add items to cart');
+      navigate('/login');
       return;
     }
-    
-    const updatedCart = cart.map(item =>
-      item._id === productId
-        ? { ...item, quantity: newQuantity }
-        : item
-    );
-    saveCartToStorage(updatedCart);
+    try {
+      await addToCart(product._id, 1);
+      alert('Added to cart!');
+    } catch (err) {
+      alert('Failed to add to cart');
+    }
   };
 
   // Get unique categories
@@ -239,24 +181,24 @@ const Products = () => {
                     <span className="product-category">{product.category}</span>
                     <span className="product-stock">Stock: {product.qty}</span>
                   </div>
-                  <div className="product-price">${product.price}</div>
+                  <div className="product-price">Rs.{product.price}</div>
                   
                   <div className="product-actions">
                     {cart.find(item => item._id === product._id) ? (
                       <div className="cart-controls">
                         <button
-                          onClick={() => updateCartQuantity(product._id, cart.find(item => item._id === product._id).quantity - 1)}
+                          onClick={() => updateQuantity(product._id, cart.find(item => (item.cake || item._id) === product._id)?.quantity - 1)}
                           className="quantity-btn"
                         >
                           -
                         </button>
                         <span className="quantity-display">
-                          {cart.find(item => item._id === product._id).quantity}
+                          {cart.find(item => (item.cake || item._id) === product._id)?.quantity}
                         </span>
                         <button
-                          onClick={() => updateCartQuantity(product._id, cart.find(item => item._id === product._id).quantity + 1)}
+                          onClick={() => updateQuantity(product._id, cart.find(item => (item.cake || item._id) === product._id)?.quantity + 1)}
                           className="quantity-btn"
-                          disabled={cart.find(item => item._id === product._id).quantity >= product.qty}
+                          disabled={cart.find(item => (item.cake || item._id) === product._id)?.quantity >= product.qty}
                         >
                           +
                         </button>
@@ -269,7 +211,7 @@ const Products = () => {
                       </div>
                     ) : (
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => onAddToCart(product)}
                         className="add-to-cart-btn"
                         disabled={product.qty === 0}
                       >

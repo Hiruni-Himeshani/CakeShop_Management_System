@@ -7,6 +7,7 @@ import AddCake from "./pages/cake_management/AddCake";
 import CakeList from "./pages/cake_management/CakeList";
 import EditCake from "./pages/cake_management/EditCake";
 import Login from "./pages/Login/Login";
+import Register from "./pages/Login/Register";
 import AdminLayout from "./components/AdminLayout/AdminLayout";
 import Dashboard from "./components/Dashboard/Dashboard";
 import { ToastContainer } from "react-toastify";
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="addcake" element={<AddCake />} />

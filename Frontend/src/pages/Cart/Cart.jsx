@@ -1,56 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Cart.css';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { assets } from '../../assets/frontend_assets/assets';
+import { useStore } from '../../context/StoreContext';
 
 const Cart = () => {
-  const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { cartItems: cart, fetchCart, updateQuantity, removeFromCart, isAuthenticated } = useStore();
+  const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadCartFromStorage();
-  }, []);
-
-  // Load cart from localStorage
-  const loadCartFromStorage = () => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
+    if (isAuthenticated) {
+      fetchCart().catch(() => {});
     }
+  }, [isAuthenticated, fetchCart]);
+
+  // Handlers wrap context API
+  const handleUpdateQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) return handleRemove(productId);
+    return updateQuantity(productId, newQuantity);
   };
 
-  // Save cart to localStorage
-  const saveCartToStorage = (newCart) => {
-    localStorage.setItem('cart', JSON.stringify(newCart));
-    setCart(newCart);
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('cartUpdated'));
-  };
-
-  // Update cart quantity
-  const updateCartQuantity = (productId, newQuantity) => {
-    if (newQuantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    
-    const updatedCart = cart.map(item =>
-      item._id === productId
-        ? { ...item, quantity: newQuantity }
-        : item
-    );
-    saveCartToStorage(updatedCart);
-  };
-
-  // Remove from cart
-  const removeFromCart = (productId) => {
-    const updatedCart = cart.filter(item => item._id !== productId);
-    saveCartToStorage(updatedCart);
-  };
+  const handleRemove = (productId) => removeFromCart(productId);
 
   // Clear entire cart
   const clearCart = () => {
@@ -139,14 +112,14 @@ const Cart = () => {
                 
                 <div className="cart-item-quantity">
                   <button
-                    onClick={() => updateCartQuantity(item._id, item.quantity - 1)}
+                    onClick={() => handleUpdateQuantity(item.cake || item._id, item.quantity - 1)}
                     className="quantity-btn"
                   >
                     -
                   </button>
                   <span className="quantity-display">{item.quantity}</span>
                   <button
-                    onClick={() => updateCartQuantity(item._id, item.quantity + 1)}
+                    onClick={() => handleUpdateQuantity(item.cake || item._id, item.quantity + 1)}
                     className="quantity-btn"
                     disabled={item.quantity >= item.qty}
                   >
@@ -159,7 +132,7 @@ const Cart = () => {
                 </div>
                 
                 <button
-                  onClick={() => removeFromCart(item._id)}
+                  onClick={() => handleRemove(item.cake || item._id)}
                   className="remove-item-btn"
                 >
                   <img src={assets.remove_icon_red} alt="Remove" />

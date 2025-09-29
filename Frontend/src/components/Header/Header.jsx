@@ -1,36 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import { assets } from "../../assets/frontend_assets/assets";
+import { useStore } from "../../context/StoreContext";
 
 const Header = () => {
   const navigate = useNavigate();
-  const [cartCount, setCartCount] = useState(0);
-
-  useEffect(() => {
-    // Load cart count from localStorage
-    const loadCartCount = () => {
-      const savedCart = localStorage.getItem('cart');
-      if (savedCart) {
-        const cart = JSON.parse(savedCart);
-        const count = cart.reduce((total, item) => total + item.quantity, 0);
-        setCartCount(count);
-      }
-    };
-
-    loadCartCount();
-
-    // Listen for storage changes (when cart is updated in other tabs)
-    window.addEventListener('storage', loadCartCount);
-    
-    // Listen for custom cart update events
-    window.addEventListener('cartUpdated', loadCartCount);
-
-    return () => {
-      window.removeEventListener('storage', loadCartCount);
-      window.removeEventListener('cartUpdated', loadCartCount);
-    };
-  }, []);
+  const { cartItems, isAuthenticated, logout } = useStore();
+  const cartCount = useMemo(() => cartItems.reduce((sum, i) => sum + i.quantity, 0), [cartItems]);
 
   const scrollToTop = () => {
     window.scrollTo(0, 0);
@@ -56,6 +33,14 @@ const Header = () => {
               <span className="cart-count">{cartCount}</span>
             )}
           </Link>
+          {!isAuthenticated ? (
+            <>
+              <button className="auth-btn" onClick={() => navigate('/login')}>Login</button>
+              <button className="auth-btn primary" onClick={() => navigate('/register')}>Register</button>
+            </>
+          ) : (
+            <button className="auth-btn" onClick={() => { logout(); navigate('/'); }}>Logout</button>
+          )}
         </div>
       </div>
     </div>

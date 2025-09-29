@@ -37,6 +37,7 @@ const register = async (req, res) => {
     const user = await User.create({ email, passwordHash, name });
 
     res.status(201).json({ 
+      success: true,
       message: 'User registered successfully',
       user: { id: user._id, email: user.email, name: user.name } 
     });
@@ -81,6 +82,7 @@ const login = async (req, res) => {
     });
 
     res.json({ 
+      success: true,
       message: 'Login successful',
       user: { id: user._id, email: user.email, name: user.name, role: user.role }, 
       accessToken 

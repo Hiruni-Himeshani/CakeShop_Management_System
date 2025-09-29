@@ -33,7 +33,7 @@ const Login = () => {
       );
 
       if (response.data.success) {
-        login(response.data.user);
+        login(response.data.user, response.data.accessToken);
         toast.success("Login successful!");
         navigate("/");
       } else {
@@ -52,6 +52,11 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-card">
+        <div className="auth-layout">
+          <div className="auth-visual">
+            <img src="/logo/logo1.png" alt="Welcome back" />
+          </div>
+          <div className="auth-form">
         <h2>Login</h2>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
@@ -87,8 +92,10 @@ const Login = () => {
 
         <div className="login-footer">
           <p>
-            Don't have an account? <span className="link">Sign up</span>
+            Don't have an account? <span className="link" onClick={() => navigate('/register')}>Sign up</span>
           </p>
+        </div>
+          </div>
         </div>
       </div>
     </div>
