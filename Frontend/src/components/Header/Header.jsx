@@ -6,7 +6,7 @@ import { useStore } from "../../context/StoreContext";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { cartItems, isAuthenticated, logout } = useStore();
+  const { cartItems, isAuthenticated, logout, user } = useStore();
   const cartCount = useMemo(() => cartItems.reduce((sum, i) => sum + i.quantity, 0), [cartItems]);
 
   const scrollToTop = () => {
@@ -39,7 +39,15 @@ const Header = () => {
               <button className="auth-btn primary" onClick={() => navigate('/register')}>Register</button>
             </>
           ) : (
-            <button className="auth-btn" onClick={() => { logout(); navigate('/'); }}>Logout</button>
+            <>
+              {user && (
+                <span className="user-name-attractive">
+                  <img src={assets.profile_icon} alt="User" className="user-avatar" />
+                  <span className="greeting-text">Hello, <b>{user.name || user.username || user.email}</b>!</span>
+                </span>
+              )}
+              <button className="auth-btn" onClick={() => { logout(); navigate('/'); }}>Logout</button>
+            </>
           )}
         </div>
       </div>
