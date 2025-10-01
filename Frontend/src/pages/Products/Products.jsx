@@ -160,7 +160,7 @@ const Products = () => {
             </div>
           ) : (
             filteredProducts.map(product => (
-              <div key={product._id} className="product-card">
+              <div key={product._id} className="product-card" onClick={() => navigate(`/cake/${product._id}`)}>
                 <div className="product-image-container">
                   <img
                     src={product.image ? `http://localhost:5000/uploads/${product.image}` : assets.menu_1}
@@ -183,7 +183,7 @@ const Products = () => {
                   </div>
                   <div className="product-price">Rs.{product.price}</div>
                   
-                  <div className="product-actions">
+                  <div className="product-actions" onClick={(e) => e.stopPropagation()}>
                     {cart.find(item => item._id === product._id) ? (
                       <div className="cart-controls">
                         <button
