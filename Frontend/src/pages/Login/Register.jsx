@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useStore } from "../../context/StoreContext";
-import "./Login.css";
+import "./LoginModern.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -40,34 +40,38 @@ const Register = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="auth-layout">
-          <div className="auth-visual">
-            <img src="/logo/logo1.png" alt="Create your account" />
+    <div className="auth-shell">
+      <div className="auth-card">
+        <div className="auth-left" style={{ backgroundImage: "linear-gradient(180deg, rgba(22,163,74,.6), rgba(22,163,74,.6)), url('/images/cake-auth.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <div className="brand">Bake.lk</div>
+          <div className="welcome">Join Bake.lk</div>
+          <p className="lead">Create your account to unlock exclusive member discounts and track your sweet orders.</p>
+          <div className="perks">
+            <div className="perk"><span className="dot">✓</span> Members-only offers</div>
+            <div className="perk"><span className="dot">✓</span> Order history</div>
+            <div className="perk"><span className="dot">✓</span> Favorite your cakes</div>
           </div>
-          <div className="auth-form">
-        <h2>Create Account</h2>
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter your name" />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email" />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Create a password" />
-          </div>
-          <button type="submit" className="login-btn" disabled={isLoading}>{isLoading ? "Creating..." : "Create Account"}</button>
-        </form>
-        <div className="login-footer">
-          <p>
-            Already have an account? <span className="link" onClick={() => navigate('/login')}>Login</span>
-          </p>
         </div>
+        <div className="auth-right">
+          <h2 className="auth-title">Create Account</h2>
+          <p className="auth-sub">It only takes a minute</p>
+          <form className="form" onSubmit={handleSubmit}>
+            <div className="field">
+              <label htmlFor="name">Full Name</label>
+              <input className="input" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter your name" />
+            </div>
+            <div className="field">
+              <label htmlFor="email">Email</label>
+              <input className="input" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email" />
+            </div>
+            <div className="field">
+              <label htmlFor="password">Password</label>
+              <input className="input" type="password" id="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Create a password" />
+            </div>
+            <button type="submit" className="cta" disabled={isLoading}>{isLoading ? 'Creating...' : 'Create Account'}</button>
+          </form>
+          <div className="login-footer">
+            <p>Already have an account? <span className="link" onClick={() => navigate('/login')}>Login</span></p>
           </div>
         </div>
       </div>

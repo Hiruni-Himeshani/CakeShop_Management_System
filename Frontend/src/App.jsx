@@ -3,6 +3,8 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Products from "./pages/Products/Products";
 import Cart from "./pages/Cart/Cart";
+import Checkout from "./pages/Checkout";
+import ThankYou from "./pages/ThankYou";
 import AddCake from "./pages/cake_management/AddCake";
 import CakeList from "./pages/cake_management/CakeList";
 import EditCake from "./pages/cake_management/EditCake";
@@ -21,6 +23,8 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<AdminLayout />}>

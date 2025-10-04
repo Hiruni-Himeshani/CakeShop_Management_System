@@ -38,21 +38,13 @@ const Cart = () => {
   const tax = subtotal * 0.08; // 8% tax
   const total = subtotal + shipping + tax;
 
-  // Proceed to checkout (placeholder function)
+  // Proceed to checkout
   const proceedToCheckout = () => {
     if (cart.length === 0) {
       alert('Your cart is empty!');
       return;
     }
-    
-    // For now, just show an alert
-    alert('Checkout functionality will be implemented soon!');
-    
-    // In a real application, you would:
-    // 1. Create an order
-    // 2. Process payment
-    // 3. Clear cart
-    // 4. Redirect to order confirmation
+    navigate('/checkout');
   };
 
   if (cart.length === 0) {
