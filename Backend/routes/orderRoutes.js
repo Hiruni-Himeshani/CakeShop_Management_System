@@ -70,12 +70,27 @@ router.post('/', verifyJWT, upload.single('receiptImage'), async (req, res) => {
 			return res.status(400).json({ message: 'Cart is empty' });
 		}
 
-		const orderedItems = cart.items.map((item) => ({
-			cake: item.cake._id,
-			name: item.cake.productName,
-			quantity: item.quantity,
-			price: item.price,
-		}));
+		// Get toppings data from request
+		let toppingsData = [];
+		if (req.body.toppingsData) {
+			toppingsData = typeof req.body.toppingsData === 'string' 
+				? JSON.parse(req.body.toppingsData) 
+				: req.body.toppingsData;
+		}
+
+		const orderedItems = cart.items.map((item) => {
+			// Find toppings for this item
+			const itemToppings = toppingsData.find(td => td.cakeId === item.cake._id.toString());
+			
+			return {
+				cake: item.cake._id,
+				name: item.cake.productName,
+				quantity: item.quantity,
+				price: item.price,
+				toppings: itemToppings ? itemToppings.toppings : [],
+				totalPrice: itemToppings ? itemToppings.totalPrice : (item.price * item.quantity)
+			};
+		});
 
 		const receiptRelativePath = req.file ? path.join('uploads', 'receipts', req.file.filename) : undefined;
 

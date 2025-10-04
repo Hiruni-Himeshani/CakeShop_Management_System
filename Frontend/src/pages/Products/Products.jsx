@@ -161,7 +161,10 @@ const Products = () => {
           ) : (
             filteredProducts.map(product => (
               <div key={product._id} className="product-card">
-                <div className="product-image-container">
+                <div 
+                  className="product-image-container clickable"
+                  onClick={() => navigate(`/cake/${product._id}`)}
+                >
                   <img
                     src={product.image ? `http://localhost:5000/uploads/${product.image}` : assets.menu_1}
                     alt={product.productName}
@@ -172,6 +175,9 @@ const Products = () => {
                       <span>Out of Stock</span>
                     </div>
                   )}
+                  <div className="view-details-overlay">
+                    <span>Click to view details</span>
+                  </div>
                 </div>
                 
                 <div className="product-info">

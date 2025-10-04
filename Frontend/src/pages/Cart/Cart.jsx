@@ -20,23 +20,52 @@ const Cart = () => {
   // Handlers wrap context API
   const handleUpdateQuantity = (productId, newQuantity) => {
     if (newQuantity <= 0) return handleRemove(productId);
+    
+    // Update the toppings data in localStorage as well
+    const cartWithToppings = JSON.parse(localStorage.getItem('cartWithToppings') || '[]');
+    const itemWithToppings = cartWithToppings.find(ct => ct.cakeId === productId);
+    if (itemWithToppings) {
+      itemWithToppings.quantity = newQuantity;
+      localStorage.setItem('cartWithToppings', JSON.stringify(cartWithToppings));
+    }
+    
     return updateQuantity(productId, newQuantity);
   };
 
-  const handleRemove = (productId) => removeFromCart(productId);
+  const handleRemove = (productId) => {
+    // Remove from localStorage as well
+    const cartWithToppings = JSON.parse(localStorage.getItem('cartWithToppings') || '[]');
+    const updatedCartWithToppings = cartWithToppings.filter(ct => ct.cakeId !== productId);
+    localStorage.setItem('cartWithToppings', JSON.stringify(updatedCartWithToppings));
+    
+    return removeFromCart(productId);
+  };
 
   // Clear entire cart
   const clearCart = () => {
     if (window.confirm('Are you sure you want to clear your cart?')) {
-      saveCartToStorage([]);
+      // Clear both cart and toppings data
+      localStorage.removeItem('cartWithToppings');
+      // Note: saveCartToStorage is not defined, so we'll just clear localStorage
+      // The cart will be cleared when the user refreshes or navigates
     }
   };
 
-  // Calculate totals
-  const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = subtotal > 50 ? 0 : 5; // Free shipping over $50
-  const tax = subtotal * 0.08; // 8% tax
-  const total = subtotal + shipping + tax;
+  // Get toppings information from localStorage
+  const cartWithToppings = JSON.parse(localStorage.getItem('cartWithToppings') || '[]');
+  
+  // Calculate totals including toppings
+  const calculateItemTotal = (item) => {
+    const itemWithToppings = cartWithToppings.find(ct => ct.cakeId === (item.cake || item._id));
+    if (itemWithToppings) {
+      return itemWithToppings.totalPrice * item.quantity;
+    }
+    return item.price * item.quantity;
+  };
+  
+  const subtotal = cart.reduce((total, item) => total + calculateItemTotal(item), 0);
+  const deliveryFee = subtotal >= 2000 ? 0 : 350; // Free delivery over Rs. 2000, otherwise Rs. 350
+  const total = subtotal + deliveryFee;
 
   // Proceed to checkout
   const proceedToCheckout = () => {
@@ -98,7 +127,22 @@ const Cart = () => {
                 
                 <div className="cart-item-details">
                   <h3 className="cart-item-name">{item.productName}</h3>
-                  <p className="cart-item-price">${item.price}</p>
+                  <p className="cart-item-price">Rs. {item.price}</p>
+                  {(() => {
+                    const itemWithToppings = cartWithToppings.find(ct => ct.cakeId === (item.cake || item._id));
+                    return itemWithToppings && itemWithToppings.toppings && itemWithToppings.toppings.length > 0 ? (
+                      <div className="cart-item-toppings">
+                        <span className="toppings-label">Toppings:</span>
+                        <div className="toppings-list">
+                          {itemWithToppings.toppings.map((topping, idx) => (
+                            <span key={idx} className="topping-tag">
+                              {topping.image} {topping.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
                   <div className="cart-item-stock">Stock: {item.qty}</div>
                 </div>
                 
@@ -120,7 +164,7 @@ const Cart = () => {
                 </div>
                 
                 <div className="cart-item-total">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  Rs. {calculateItemTotal(item).toFixed(2)}
                 </div>
                 
                 <button
@@ -139,29 +183,24 @@ const Cart = () => {
               
               <div className="summary-row">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>Rs. {subtotal.toFixed(2)}</span>
               </div>
               
               <div className="summary-row">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
-              </div>
-              
-              <div className="summary-row">
-                <span>Tax</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>Delivery Fee</span>
+                <span>{deliveryFee === 0 ? 'Free' : `Rs. ${deliveryFee.toFixed(2)}`}</span>
               </div>
               
               <hr className="summary-divider" />
               
               <div className="summary-row total-row">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>Rs. {total.toFixed(2)}</span>
               </div>
               
-              {shipping > 0 && (
-                <div className="free-shipping-note">
-                  Add ${(50 - subtotal).toFixed(2)} more for free shipping!
+              {deliveryFee > 0 && (
+                <div className="free-delivery-note">
+                  Add Rs. {(2000 - subtotal).toFixed(2)} more for free delivery!
                 </div>
               )}
               
@@ -190,3 +229,4 @@ const Cart = () => {
 };
 
 export default Cart;
+

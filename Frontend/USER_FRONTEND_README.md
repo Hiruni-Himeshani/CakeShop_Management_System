@@ -24,9 +24,8 @@ This document describes the user-facing frontend features that have been added t
 - **Remove items** from cart
 - **Clear entire cart** functionality
 - **Order summary** with:
-  - Subtotal calculation
-  - Shipping costs (free over $50)
-  - Tax calculation (8%)
+  - Subtotal calculation (cake price + toppings)
+  - Delivery fee: Rs. 350 (free over Rs. 2000)
   - Total amount
 - **Checkout button** (placeholder for future implementation)
 - **Empty cart state** with call-to-action

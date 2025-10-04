@@ -109,6 +109,36 @@
   color: #666;
 }
 
+.cart-item-toppings {
+  margin: 8px 0;
+}
+
+.toppings-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 4px 0;
+  display: block;
+}
+
+.toppings-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.topping-tag {
+  background: linear-gradient(135deg, #5AB4A6, #68e0ce);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .cart-item-quantity {
   display: flex;
   align-items: center;
