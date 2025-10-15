@@ -10,6 +10,8 @@ const authRoutes = require('./routes/authRoutes');
 const cakeRoutes = require('./routes/cakeRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const walletRoutes = require('./routes/walletRoutes');
+const commentRoutes = require('./routes/commentRoutes');
 
 // Connect to MongoDB
 connectDB();
@@ -26,6 +28,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cakes', cakeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/comments', commentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

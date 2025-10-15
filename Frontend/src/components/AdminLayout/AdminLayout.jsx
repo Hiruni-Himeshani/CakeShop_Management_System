@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import "./AdminLayout.css";
-import Header from "../Header/Header";
 import Slidebar from "../Slidebar/Slidebar";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
@@ -14,7 +13,6 @@ const AdminLayout = () => {
     <div className="admin-layout">
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
       <Navbar setShowLogin={setShowLogin} />
-      <Header />
       <div className="main-content">
         <Slidebar />
         <div className="content-area">

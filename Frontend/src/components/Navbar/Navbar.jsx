@@ -16,7 +16,7 @@ const Navbar = ({setShowLogin}) => {
       setInfo(!info); // Toggle between true/false
     };
 
-    const { cartItems, isAuthenticated, logout: logoutUser } = useContext(StoreContext);
+    const { cartItems, isAuthenticated, logout: logoutUser, user } = useContext(StoreContext);
     const navigate = useNavigate();
 
     const logout = () =>{
@@ -30,7 +30,10 @@ const Navbar = ({setShowLogin}) => {
       <Link to='/'><img src={assets.logo} alt="" /></Link>
       <ul className='navbar-menu'>
         <Link to='/' onClick={()=>{ setMenu("home")}} className={menu==="home"?"active":""}>home</Link>
-        <a  href='/#explore-menu' onClick={()=>{ setMenu("menu")}} className={menu==="menu"?"active":""}>menu</a>
+        {user?.role !== 'admin' && <>
+        <Link to='/products' onClick={()=>{ setMenu("menu")}} className={menu==="menu"?"active":""}>menu</Link>
+        <Link to='/wallet' onClick={()=>{ setMenu("wallet")}} className={menu==="wallet"?"active":""}>wallet</Link>
+        </>}
         <a href='#footer' onClick={()=>{ setMenu("contact-us")}} className={menu==="contact-us"?"active":""}>contact us</a>
       </ul>
       <div className="navbar-right">
@@ -40,6 +43,7 @@ const Navbar = ({setShowLogin}) => {
         </div>
         {!isAuthenticated ? <button className='btn' onClick={()=>{setShowLogin(true)}} >sign  in </button> : <div onClick={handleClick} className={`navbar-profile ${info ? 'profile-active' : ''}`} >
           <img src={assets.profile_icon} alt="" />
+          <span className="user-name">{user?.name || user?.username || 'User'}</span>
           <ul className="nav-profile-dropdown">
             <li onClick={()=>navigate('/myorders')} ><img src={assets.bag_icon} alt="" /><p>Orders</p></li>
             <hr />

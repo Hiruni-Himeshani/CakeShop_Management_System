@@ -4,7 +4,7 @@ import "./Header.css";
 import { assets } from "../../assets/frontend_assets/assets";
 import { useStore } from "../../context/StoreContext";
 
-const Header = () => {
+const Header = ({ setShowLogin }) => {
   const navigate = useNavigate();
   const { cartItems, isAuthenticated, logout, user } = useStore();
   const cartCount = useMemo(() => cartItems.reduce((sum, i) => sum + i.quantity, 0), [cartItems]);
@@ -35,8 +35,8 @@ const Header = () => {
           </Link>
           {!isAuthenticated ? (
             <>
-              <button className="auth-btn" onClick={() => navigate('/login')}>Login</button>
-              <button className="auth-btn primary" onClick={() => navigate('/register')}>Register</button>
+              <button className="auth-btn" onClick={() => setShowLogin(true)}>Login</button>
+              <button className="auth-btn primary" onClick={() => setShowLogin(true)}>Register</button>
             </>
           ) : (
             <>

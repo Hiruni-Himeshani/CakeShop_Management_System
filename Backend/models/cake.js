@@ -13,7 +13,9 @@ const cakeSchema = new mongoose.Schema({
   category: { type: String, required: true },
   price: { type: Number, required: true, min: 0 },
   image: { type: String }, // will store image file path
-  toppings: [toppingSchema] // Array of available toppings for this cake
+  toppings: [toppingSchema], // Array of available toppings for this cake
+  averageRating: { type: Number, default: 0 },
+  ratingsCount: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Cake", cakeSchema);

@@ -18,27 +18,15 @@ if (MAIL_USER && MAIL_PASS) {
 }
 
 async function sendOrderConfirmationEmail({ toEmail, customerName, orderId, items, paymentMethod }) {
-	const itemsRows = items.map(i => {
-		// Use totalPrice if available (includes toppings), otherwise calculate from base price
-		const itemTotal = i.totalPrice ? i.totalPrice.toFixed(2) : (i.price * i.quantity).toFixed(2);
-		const toppingsText = i.toppings && i.toppings.length > 0 
-			? `<br><small style="color:#666;font-size:12px;">Toppings: ${i.toppings.map(t => t.name).join(', ')}</small>`
-			: '';
-		
-		return `
+	const itemsRows = items.map(i => `
 		<tr>
-			<td style="padding:8px 12px;border-bottom:1px solid #eee">${i.name}${toppingsText}</td>
+			<td style="padding:8px 12px;border-bottom:1px solid #eee">${i.name}</td>
 			<td style="padding:8px 12px;border-bottom:1px solid #eee">${i.quantity}</td>
-			<td style="padding:8px 12px;border-bottom:1px solid #eee">Rs. ${itemTotal}</td>
+			<td style="padding:8px 12px;border-bottom:1px solid #eee">$${(i.price * i.quantity).toFixed(2)}</td>
 		</tr>
-		`;
-	}).join('');
+	`).join('');
 
-	// Calculate subtotal using totalPrice (includes toppings) if available, otherwise use base price
-	const subtotal = items.reduce((s, i) => {
-		return s + (i.totalPrice || (i.price * i.quantity));
-	}, 0);
-	const subtotalFormatted = subtotal.toFixed(2);
+	const subtotal = items.reduce((s, i) => s + (i.price * i.quantity), 0);
 
 	const html = `
 		<div style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;max-width:640px;margin:0 auto;padding:16px;background:#f8fafc">
@@ -58,7 +46,7 @@ async function sendOrderConfirmationEmail({ toEmail, customerName, orderId, item
 						${itemsRows}
 					</tbody>
 				</table>
-				<p style="margin:0;color:#0f172a"><b>Subtotal:</b> Rs. ${subtotalFormatted}</p>
+				<p style="margin:0;color:#0f172a"><b>Subtotal:</b> $${subtotal.toFixed(2)}</p>
 				<p style="margin:4px 0 0;color:#0f172a"><b>Payment Method:</b> ${paymentMethod === 'COD' ? 'Cash on Delivery' : 'Bank Transfer'}</p>
 				<hr style="margin:18px 0;border:none;border-top:1px solid #e2e8f0" />
 				<p style="margin:0;color:#475569">If you have any questions, reply to this email.</p>

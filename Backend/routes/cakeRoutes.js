@@ -8,6 +8,7 @@ const {
   updateCake,
   deleteCake
 } = require("../controllers/cakeController");
+const { verifyJWT, requireAdmin } = require("../middleware/authJwt");
 
 const router = express.Router();
 
@@ -48,10 +49,13 @@ const handleUploadError = (err, req, res, next) => {
 };
 
 // Routes
-router.post("/", upload.single("image"), handleUploadError, addCake);
+// Public routes (no authentication required)
 router.get("/", getAllCakes);
 router.get("/:id", getCakeById);
-router.patch("/:id", upload.single("image"), handleUploadError, updateCake);
-router.delete("/:id", deleteCake);
+
+// Admin routes (authentication and admin role required)
+router.post("/", verifyJWT, requireAdmin, upload.single("image"), handleUploadError, addCake);
+router.patch("/:id", verifyJWT, requireAdmin, upload.single("image"), handleUploadError, updateCake);
+router.delete("/:id", verifyJWT, requireAdmin, deleteCake);
 
 module.exports = router;

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Products.css';
-import Header from '../../components/Header/Header';
+import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import { assets } from '../../assets/frontend_assets/assets';
 import { useStore } from '../../context/StoreContext';
 
-const Products = () => {
+const Products = ({ setShowLogin }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,14 +46,14 @@ const Products = () => {
   const onAddToCart = async (product) => {
     if (!isAuthenticated) {
       alert('Please login to add items to cart');
-      navigate('/login');
+      setShowLogin(true);
       return;
     }
     try {
       await addToCart(product._id, 1);
-      alert('Added to cart!');
+      toast.success('Added to cart');
     } catch (err) {
-      alert('Failed to add to cart');
+      toast.error('Failed to add to cart');
     }
   };
 
@@ -83,7 +84,7 @@ const Products = () => {
   if (loading) {
     return (
       <div className="products-page">
-        <Header />
+        <Navbar setShowLogin={setShowLogin} />
         <div className="loading-container">
           <div className="loading-spinner"></div>
           <p>Loading products...</p>
@@ -96,7 +97,7 @@ const Products = () => {
   if (error) {
     return (
       <div className="products-page">
-        <Header />
+        <Navbar setShowLogin={setShowLogin} />
         <div className="error-container">
           <p>{error}</p>
           <button onClick={fetchProducts} className="retry-btn">Retry</button>
@@ -108,7 +109,7 @@ const Products = () => {
 
   return (
     <div className="products-page">
-      <Header />
+      <Navbar setShowLogin={setShowLogin} />
       
       <div className="products-container">
         <div className="products-header">
@@ -160,11 +161,8 @@ const Products = () => {
             </div>
           ) : (
             filteredProducts.map(product => (
-              <div key={product._id} className="product-card">
-                <div 
-                  className="product-image-container clickable"
-                  onClick={() => navigate(`/cake/${product._id}`)}
-                >
+              <div key={product._id} className="product-card" onClick={() => navigate(`/cake/${product._id}`)}>
+                <div className="product-image-container">
                   <img
                     src={product.image ? `http://localhost:5000/uploads/${product.image}` : assets.menu_1}
                     alt={product.productName}
@@ -175,9 +173,6 @@ const Products = () => {
                       <span>Out of Stock</span>
                     </div>
                   )}
-                  <div className="view-details-overlay">
-                    <span>Click to view details</span>
-                  </div>
                 </div>
                 
                 <div className="product-info">
@@ -189,7 +184,7 @@ const Products = () => {
                   </div>
                   <div className="product-price">Rs.{product.price}</div>
                   
-                  <div className="product-actions">
+                  <div className="product-actions" onClick={(e) => e.stopPropagation()}>
                     {cart.find(item => item._id === product._id) ? (
                       <div className="cart-controls">
                         <button

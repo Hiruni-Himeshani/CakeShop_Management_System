@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Cart.css';
-import Header from '../../components/Header/Header';
+import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import { assets } from '../../assets/frontend_assets/assets';
 import { useStore } from '../../context/StoreContext';
 
-const Cart = () => {
+const Cart = ({ setShowLogin }) => {
   const { cartItems: cart, fetchCart, updateQuantity, removeFromCart, isAuthenticated } = useStore();
   const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -17,54 +17,29 @@ const Cart = () => {
     }
   }, [isAuthenticated, fetchCart]);
 
+  // Debug cart items
+  useEffect(() => {
+    console.log('Cart items in Cart page:', cart);
+  }, [cart]);
+
   // Handlers wrap context API
   const handleUpdateQuantity = (productId, newQuantity) => {
     if (newQuantity <= 0) return handleRemove(productId);
-    
-    // Update the toppings data in localStorage as well
-    const cartWithToppings = JSON.parse(localStorage.getItem('cartWithToppings') || '[]');
-    const itemWithToppings = cartWithToppings.find(ct => ct.cakeId === productId);
-    if (itemWithToppings) {
-      itemWithToppings.quantity = newQuantity;
-      localStorage.setItem('cartWithToppings', JSON.stringify(cartWithToppings));
-    }
-    
     return updateQuantity(productId, newQuantity);
   };
 
-  const handleRemove = (productId) => {
-    // Remove from localStorage as well
-    const cartWithToppings = JSON.parse(localStorage.getItem('cartWithToppings') || '[]');
-    const updatedCartWithToppings = cartWithToppings.filter(ct => ct.cakeId !== productId);
-    localStorage.setItem('cartWithToppings', JSON.stringify(updatedCartWithToppings));
-    
-    return removeFromCart(productId);
-  };
+  const handleRemove = (productId) => removeFromCart(productId);
 
   // Clear entire cart
   const clearCart = () => {
     if (window.confirm('Are you sure you want to clear your cart?')) {
-      // Clear both cart and toppings data
-      localStorage.removeItem('cartWithToppings');
-      // Note: saveCartToStorage is not defined, so we'll just clear localStorage
-      // The cart will be cleared when the user refreshes or navigates
+      saveCartToStorage([]);
     }
   };
 
-  // Get toppings information from localStorage
-  const cartWithToppings = JSON.parse(localStorage.getItem('cartWithToppings') || '[]');
-  
-  // Calculate totals including toppings
-  const calculateItemTotal = (item) => {
-    const itemWithToppings = cartWithToppings.find(ct => ct.cakeId === (item.cake || item._id));
-    if (itemWithToppings) {
-      return itemWithToppings.totalPrice * item.quantity;
-    }
-    return item.price * item.quantity;
-  };
-  
-  const subtotal = cart.reduce((total, item) => total + calculateItemTotal(item), 0);
-  const deliveryFee = subtotal >= 2000 ? 0 : 350; // Free delivery over Rs. 2000, otherwise Rs. 350
+  // Calculate totals
+  const subtotal = cart.reduce((total, item) => total + (item.totalPrice || (item.price * item.quantity)), 0);
+  const deliveryFee = subtotal >= 3500 ? 0 : 350; // Free delivery over Rs. 3500, otherwise Rs. 350
   const total = subtotal + deliveryFee;
 
   // Proceed to checkout
@@ -79,7 +54,7 @@ const Cart = () => {
   if (cart.length === 0) {
     return (
       <div className="cart-page">
-        <Header />
+        <Navbar setShowLogin={setShowLogin} />
         <div className="cart-container">
           <div className="cart-header">
             <h1>Shopping Cart</h1>
@@ -104,7 +79,7 @@ const Cart = () => {
 
   return (
     <div className="cart-page">
-      <Header />
+      <Navbar setShowLogin={setShowLogin} />
       
       <div className="cart-container">
         <div className="cart-header">
@@ -120,29 +95,27 @@ const Cart = () => {
               <div key={item._id} className="cart-item">
                 <div className="cart-item-image">
                   <img
-                    src={item.image ? `http://localhost:5000/uploads/${item.image}` : assets.menu_1}
-                    alt={item.productName}
+                    src={item.image ? `http://localhost:5000/uploads/${item.image}` : (item.product?.image ? `http://localhost:5000/uploads/${item.product.image}` : assets.menu_1)}
+                    alt={item.productName || item.product?.name || 'Cake'}
+                    onError={(e) => {
+                      e.target.src = assets.menu_1;
+                    }}
                   />
                 </div>
                 
                 <div className="cart-item-details">
                   <h3 className="cart-item-name">{item.productName}</h3>
                   <p className="cart-item-price">Rs. {item.price}</p>
-                  {(() => {
-                    const itemWithToppings = cartWithToppings.find(ct => ct.cakeId === (item.cake || item._id));
-                    return itemWithToppings && itemWithToppings.toppings && itemWithToppings.toppings.length > 0 ? (
-                      <div className="cart-item-toppings">
-                        <span className="toppings-label">Toppings:</span>
-                        <div className="toppings-list">
-                          {itemWithToppings.toppings.map((topping, idx) => (
-                            <span key={idx} className="topping-tag">
-                              {topping.image} {topping.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ) : null;
-                  })()}
+                  {item.toppings && item.toppings.length > 0 && (
+                    <div className="cart-item-toppings">
+                      <span className="toppings-label">Toppings: </span>
+                      {item.toppings.map((topping, index) => (
+                        <span key={index} className="topping-tag">
+                          {topping.name} (+Rs. {topping.price})
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <div className="cart-item-stock">Stock: {item.qty}</div>
                 </div>
                 
@@ -164,14 +137,21 @@ const Cart = () => {
                 </div>
                 
                 <div className="cart-item-total">
-                  Rs. {calculateItemTotal(item).toFixed(2)}
+                  Rs. {(item.totalPrice || (item.price * item.quantity)).toFixed(2)}
                 </div>
                 
                 <button
-                  onClick={() => handleRemove(item.cake || item._id)}
+                  onClick={() => {
+                    if (window.confirm(`Remove "${item.productName || item.product?.name || 'this item'}" from cart?`)) {
+                      handleRemove(item.cake || item._id);
+                    }
+                  }}
                   className="remove-item-btn"
+                  title="Remove from cart"
                 >
-                  <img src={assets.remove_icon_red} alt="Remove" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/>
+                  </svg>
                 </button>
               </div>
             ))}
@@ -199,8 +179,8 @@ const Cart = () => {
               </div>
               
               {deliveryFee > 0 && (
-                <div className="free-delivery-note">
-                  Add Rs. {(2000 - subtotal).toFixed(2)} more for free delivery!
+                <div className="free-shipping-note">
+                  Add Rs. {(3500 - subtotal).toFixed(2)} more for free delivery!
                 </div>
               )}
               
@@ -229,4 +209,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

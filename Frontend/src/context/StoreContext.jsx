@@ -49,22 +49,35 @@ export const StoreProvider = ({ children }) => {
         if (!isAuthenticated) return;
         const res = await api.get('/api/cart');
         const items = res.data?.items || res.data?.cart?.items || [];
+        console.log('Fetched cart items:', items);
         setCartItems(items.map((i) => ({
             cake: i.cake?._id || i.cake,
             quantity: i.quantity,
             price: i.price,
+            toppings: i.toppings || [],
+            toppingsPrice: i.toppingsPrice || 0,
+            totalPrice: i.totalPrice || (i.price * i.quantity),
             product: i.cake?._id ? i.cake : undefined,
+            productName: i.cake?.productName || i.cake?.name,
+            qty: i.cake?.qty,
+            image: i.cake?.image
         })));
     };
 
-    const addToCart = async (cakeId, quantity = 1) => {
-        const res = await api.post('/api/cart/add', { cakeId, quantity });
+    const addToCart = async (cakeId, quantity = 1, toppings = []) => {
+        const res = await api.post('/api/cart/add', { cakeId, quantity, toppings });
         const items = res.data?.items || [];
         setCartItems(items.map((i) => ({
             cake: i.cake?._id || i.cake,
             quantity: i.quantity,
             price: i.price,
+            toppings: i.toppings || [],
+            toppingsPrice: i.toppingsPrice || 0,
+            totalPrice: i.totalPrice || (i.price * i.quantity),
             product: i.cake?._id ? i.cake : undefined,
+            productName: i.cake?.productName || i.cake?.name,
+            qty: i.cake?.qty,
+            image: i.cake?.image
         })));
     };
 
@@ -75,7 +88,13 @@ export const StoreProvider = ({ children }) => {
             cake: i.cake?._id || i.cake,
             quantity: i.quantity,
             price: i.price,
+            toppings: i.toppings || [],
+            toppingsPrice: i.toppingsPrice || 0,
+            totalPrice: i.totalPrice || (i.price * i.quantity),
             product: i.cake?._id ? i.cake : undefined,
+            productName: i.cake?.productName || i.cake?.name,
+            qty: i.cake?.qty,
+            image: i.cake?.image
         })));
     };
 
@@ -86,7 +105,13 @@ export const StoreProvider = ({ children }) => {
             cake: i.cake?._id || i.cake,
             quantity: i.quantity,
             price: i.price,
+            toppings: i.toppings || [],
+            toppingsPrice: i.toppingsPrice || 0,
+            totalPrice: i.totalPrice || (i.price * i.quantity),
             product: i.cake?._id ? i.cake : undefined,
+            productName: i.cake?.productName || i.cake?.name,
+            qty: i.cake?.qty,
+            image: i.cake?.image
         })));
     };
 

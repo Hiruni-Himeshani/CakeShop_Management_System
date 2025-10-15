@@ -1,38 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import "./Home.css";
-import Header from "../../components/Header/Header";
+import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import { assets } from "../../assets/frontend_assets/assets";
-import axios from "axios";
 
-const Home = () => {
-  const [featuredCakes, setFeaturedCakes] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchFeaturedCakes();
-  }, []);
-
-  const fetchFeaturedCakes = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/cakes');
-      if (response.data.success) {
-        // Get first 3 cakes as featured
-        setFeaturedCakes(response.data.data.slice(0, 3));
-      } else {
-        throw new Error(response.data.message || 'Failed to fetch cakes');
-      }
-    } catch (error) {
-      console.error('Error fetching featured cakes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const Home = ({ setShowLogin }) => {
   return (
     <div className="home">
-      <Header />
+      <Navbar setShowLogin={setShowLogin} />
       
       <div className="home-hero">
         <div className="hero-content">
@@ -49,34 +25,6 @@ const Home = () => {
         </div>
         <div className="hero-image">
           <img src={assets.header_img} alt="Delicious Cakes" />
-        </div>
-      </div>
-
-      <div className="home-features">
-        <div className="features-container">
-          <h2>Featured Cakes</h2>
-          <div className="features-grid">
-            {loading ? (
-              <div className="loading-message">Loading featured cakes...</div>
-            ) : featuredCakes.length > 0 ? (
-              featuredCakes.map((cake) => (
-                <Link key={cake._id} to={`/cake/${cake._id}`} className="feature-card clickable">
-                  <img 
-                    src={cake.image ? `http://localhost:5000/uploads/${cake.image}` : assets.menu_1} 
-                    alt={cake.productName} 
-                  />
-                  <h3>{cake.productName}</h3>
-                  <p>{cake.description || 'Delicious homemade cake made with fresh ingredients and love.'}</p>
-                  <div className="cake-price">Rs. {cake.price.toLocaleString()}</div>
-                  <div className={`stock-status ${cake.qty > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                    {cake.qty > 0 ? 'In Stock' : 'Out of Stock'}
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <div className="no-cakes-message">No cakes available at the moment.</div>
-            )}
-          </div>
         </div>
       </div>
 

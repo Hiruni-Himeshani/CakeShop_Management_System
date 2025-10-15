@@ -1,13 +1,15 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoginPopup.css';
 import { assets } from '../../assets/frontend_assets/assets';
-import { StoreContext } from '../../context/StoreContext';
+import { useStore } from '../../context/StoreContext';
 import axios from 'axios';
 
 // eslint-disable-next-line react/prop-types
 const LoginPopup = ({ setShowLogin }) => {
-  const { url, setToken } = useContext(StoreContext);
+  const { login } = useStore();
+  const navigate = useNavigate();
 
   const [currState, setCurrState] = useState('login');
   const [data, setData] = useState({
@@ -26,26 +28,48 @@ const LoginPopup = ({ setShowLogin }) => {
 
   const onLogin = async (event) => {
     event.preventDefault();
-    let newurl = url;
+    let newurl = 'http://localhost:5000';
     if (currState === 'login') {
-      newurl += '/api/user/login';
+      newurl += '/api/auth/login';
     } else {
-      newurl += '/api/user/register';
+      newurl += '/api/auth/register';
     }
 
     try {
       const response = await axios.post(newurl, data);
 
       if (response.data.success) {
-        setToken(response.data.token);
-        localStorage.setItem('token', response.data.token);
+        if (currState === 'login') {
+          login(response.data.user, response.data.accessToken);
+          // Role-based redirection
+          if (response.data.user.role === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/');
+          }
+        } else {
+          // Auto-login after register
+          const loginResponse = await axios.post('http://localhost:5000/api/auth/login', {
+            email: data.email,
+            password: data.password
+          });
+          if (loginResponse.data.success) {
+            login(loginResponse.data.user, loginResponse.data.accessToken);
+            // Role-based redirection for registered users
+            if (loginResponse.data.user.role === 'admin') {
+              navigate('/admin');
+            } else {
+              navigate('/');
+            }
+          }
+        }
         setShowLogin(false);
       } else {
         alert(response.data.message);
       }
     } catch (error) {
       console.error('Login/Register failed:', error);
-      alert('An error occurred during the login/register process. Please try again.');
+      alert(error.response?.data?.message || 'An error occurred during the login/register process. Please try again.');
     }
   };
 

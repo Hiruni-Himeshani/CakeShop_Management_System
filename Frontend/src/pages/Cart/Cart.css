@@ -110,33 +110,24 @@
 }
 
 .cart-item-toppings {
-  margin: 8px 0;
+  margin: 0.5rem 0;
 }
 
 .toppings-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 0.9rem;
   color: #666;
-  margin: 0 0 4px 0;
-  display: block;
-}
-
-.toppings-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  font-weight: 500;
 }
 
 .topping-tag {
-  background: linear-gradient(135deg, #5AB4A6, #68e0ce);
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 4px;
+  margin-top: 2px;
 }
 
 .cart-item-quantity {
@@ -187,19 +178,32 @@
 }
 
 .remove-item-btn {
-  background: none;
-  border: none;
+  background: #ffebee;
+  border: 2px solid #e57373;
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d32f2f;
+  width: 40px;
+  height: 40px;
 }
 
 .remove-item-btn:hover {
-  background: #f8f9fa;
+  background: #e57373;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(229, 115, 115, 0.3);
 }
 
-.remove-item-btn img {
+.remove-item-btn:active {
+  transform: scale(0.95);
+}
+
+.remove-item-btn svg {
   width: 20px;
   height: 20px;
 }

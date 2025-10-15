@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
-const ThankYou = () => {
+const ThankYou = ({ setShowLogin }) => {
 	const [params] = useSearchParams();
 	const orderId = params.get('orderId');
 
